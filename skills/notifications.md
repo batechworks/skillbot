@@ -1,6 +1,7 @@
 ---
 name: notifications
 description: Send macOS desktop notifications via osascript
+platform: macos
 ---
 
 # Notifications

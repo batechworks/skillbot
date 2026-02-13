@@ -2,6 +2,7 @@
 name: context-manager
 description: Manages conversation context window with auto-compaction, manual /compact, and memory persistence
 always: true
+platform: cross-platform
 ---
 
 # Context Manager

@@ -1,6 +1,7 @@
 ---
 name: google-workspace
 description: Gmail, Google Calendar, and Google Drive via the gog CLI tool
+platform: cross-platform
 ---
 
 # Google Workspace

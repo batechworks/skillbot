@@ -1,6 +1,7 @@
 ---
 name: subagent
 description: Spawn background subagents for complex, time-consuming, or parallel tasks. Use when a task would take many tool rounds, when you want to do research while continuing the conversation, or when multiple independent tasks can run in parallel.
+platform: cross-platform
 ---
 
 # Subagent

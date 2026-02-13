@@ -1,6 +1,7 @@
 ---
 name: system-info
 description: Get system information including OS, hardware, processes, network, disk, battery, and performance details.
+platform: cross-platform
 ---
 
 # System Info

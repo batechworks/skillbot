@@ -1,6 +1,7 @@
 ---
 name: weather
 description: Get current weather, forecasts, and moon phase (no API key required).
+platform: cross-platform
 ---
 
 # Weather

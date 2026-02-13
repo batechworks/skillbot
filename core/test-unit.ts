@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadSkills, parseFrontmatter, buildSystemPrompt } from "./skills.js";
-import { createBashTool } from "./tools.js";
+import { createBashTool, extractBaseCommand, splitCommandSegments, guardCommand } from "./tools.js";
 import {
   getSession, appendMessages, resetSession, estimateTokens, needsCompaction,
 } from "./session.js";
@@ -247,6 +247,72 @@ async function testMockBashCoverage() {
 }
 
 // ══════════════════════════════════════════════════════════════════
+// 6. Command Parsing (whitelist helpers)
+// ══════════════════════════════════════════════════════════════════
+
+function testCommandParsing() {
+  console.log("\n--- Command Parsing ---");
+
+  // extractBaseCommand
+  assert("simple command", extractBaseCommand("curl wttr.in") === "curl");
+  assert("with path prefix", extractBaseCommand("/usr/bin/curl wttr.in") === "curl");
+  assert("with env vars", extractBaseCommand("LANG=en curl wttr.in") === "curl");
+  assert("with sudo", extractBaseCommand("sudo apt install gh") === "apt");
+  assert("with nohup", extractBaseCommand("nohup python3 script.py") === "python3");
+
+  // splitCommandSegments
+  const piped = splitCommandSegments("curl wttr.in | head -5");
+  assert("pipe splits into 2", piped.length === 2);
+  assert("pipe first cmd", piped[0].startsWith("curl"));
+  assert("pipe second cmd", piped[1].startsWith("head"));
+
+  const chained = splitCommandSegments("mkdir -p dir && cd dir && ls");
+  assert("&& splits into 3", chained.length === 3);
+
+  const orChain = splitCommandSegments("command1 || command2");
+  assert("|| splits into 2", orChain.length === 2);
+
+  const semicolon = splitCommandSegments("echo hello; echo world");
+  assert("; splits into 2", semicolon.length === 2);
+
+  // guardCommand — deny patterns still work without whitelist
+  assert("deny rm -rf /", guardCommand("rm -rf /", "/tmp") !== null);
+  assert("deny shutdown", guardCommand("shutdown -h now", "/tmp") !== null);
+  assert("allow echo", guardCommand("echo hello", "/tmp") === null);
+  assert("allow curl", guardCommand("curl wttr.in", "/tmp") === null);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 7. Skill Platform Tags
+// ══════════════════════════════════════════════════════════════════
+
+function testSkillPlatformTags() {
+  console.log("\n--- Skill Platform Tags ---");
+
+  const skillsDir = path.resolve(import.meta.dirname, "..", "skills");
+  const files = fs.readdirSync(skillsDir).filter((f) => f.endsWith(".md"));
+
+  let allHavePlatform = true;
+  const missing: string[] = [];
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(skillsDir, file), "utf-8");
+    const { meta } = parseFrontmatter(raw);
+    if (!meta.platform) {
+      allHavePlatform = false;
+      missing.push(file);
+    }
+  }
+  assert("all skills have platform tag", allHavePlatform, `missing: ${missing.join(", ")}`);
+
+  // Check specific known tags
+  const appleNotes = fs.readFileSync(path.join(skillsDir, "apple-notes.md"), "utf-8");
+  assert("apple-notes is macos", parseFrontmatter(appleNotes).meta.platform === "macos");
+
+  const weather = fs.readFileSync(path.join(skillsDir, "weather.md"), "utf-8");
+  assert("weather is cross-platform", parseFrontmatter(weather).meta.platform === "cross-platform");
+}
+
+// ══════════════════════════════════════════════════════════════════
 // Main
 // ══════════════════════════════════════════════════════════════════
 
@@ -262,6 +328,8 @@ async function main() {
   testCompactionThreshold();
   await testSpawnToolValidation();
   await testMockBashCoverage();
+  testCommandParsing();
+  testSkillPlatformTags();
 
   console.log("\n" + "=".repeat(50));
   console.log(`\nResults: ${passed} passed, ${failed} failed\n`);

@@ -1,6 +1,7 @@
 ---
 name: market-data
 description: Get real-time cryptocurrency prices, stock quotes, and forex rates using free APIs (no API keys needed).
+platform: cross-platform
 ---
 
 # Market Data

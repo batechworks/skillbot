@@ -2,6 +2,7 @@
 name: persona
 description: Loads persona (SOUL.md) and user profile (USER.md) to customize behavior and tone
 always: true
+platform: cross-platform
 ---
 
 # Persona

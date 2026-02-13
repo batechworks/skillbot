@@ -1,6 +1,7 @@
 ---
 name: imessage
 description: Read and send iMessage/SMS on macOS using the imsg CLI (list chats, history, watch, send).
+platform: macos
 ---
 
 # iMessage

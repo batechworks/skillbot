@@ -1,13 +1,14 @@
 ---
 name: calendar
 description: macOS Calendar app via AppleScript and icalBuddy CLI
+platform: macos
 ---
 
 # Calendar
 
 Access macOS Calendar events using AppleScript or `icalBuddy`.
 
-## Using icalBuddy (recommended)
+## Using icalBuddy (recommended, macOS)
 
 Install:
 

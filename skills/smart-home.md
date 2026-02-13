@@ -1,6 +1,7 @@
 ---
 name: smart-home
 description: Control Philips Hue lights and scenes via the OpenHue CLI.
+platform: cross-platform
 ---
 
 # Smart Home (Philips Hue)

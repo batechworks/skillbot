@@ -1,6 +1,7 @@
 ---
 name: web-search
 description: Search the web, fetch page content, and look up information using curl and CLI tools.
+platform: cross-platform
 ---
 
 # Web Search

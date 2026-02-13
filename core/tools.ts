@@ -6,20 +6,92 @@ import { chat } from "./llm.js";
 import { dbg } from "./debug.js";
 
 // ── Safety guards ──
+
+// Layer 1: Deny patterns (always active — catches obviously destructive commands)
 const DENY_PATTERNS: RegExp[] = [
   /\brm\s+-[rf]{1,2}\s+[~\/]/, /\bdel\s+\/[fq]\b/i,
   /\b(format|mkfs|diskpart)\b/i, /\bdd\s+if=/, />\s*\/dev\/sd/,
   /\b(shutdown|reboot|poweroff)\b/, /:\(\)\s*\{.*\};\s*:/, /\bchmod\s+-R\s+777\s+\//,
 ];
+
+// Layer 2: Command whitelist (opt-in — only whitelisted base commands may execute)
+const DEFAULT_WHITELIST = [
+  // Shell builtins & coreutils
+  "echo", "cat", "head", "tail", "grep", "rg", "find", "ls", "pwd", "date",
+  "wc", "sort", "uniq", "sed", "awk", "tr", "tee", "xargs", "test", "[",
+  "true", "false", "mkdir", "cp", "mv", "touch", "rm", "file", "diff",
+  "chmod", "chown", "sleep", "kill", "pgrep", "which", "whoami", "uname",
+  "env", "basename", "dirname", "realpath", "mktemp", "printf",
+  // Data & network
+  "curl", "wget", "python3", "python", "node", "jq",
+  // Dev tools
+  "git", "gh", "npm", "npx", "docker", "tmux", "crontab",
+  // System info
+  "df", "du", "ps", "top", "uptime", "ifconfig", "nslookup", "lsof",
+  "sw_vers", "sysctl", "system_profiler", "pmset",
+  // macOS tools
+  "osascript", "screencapture", "pbcopy", "pbpaste", "say", "open",
+  "icalBuddy", "launchctl", "at", "sips",
+  // Skill CLIs
+  "himalaya", "gh", "spogo", "spotify_player", "openhue", "imsg", "memo",
+  "remindctl", "obsidian-cli", "gog", "summarize", "nano-pdf",
+  "whisper", "codex", "claude", "pi", "opencode",
+  // Package managers (install only — users may need to set up tools)
+  "brew", "pip", "uv", "cargo", "apt",
+];
+
+/** Parse the SKILLBOT_COMMAND_WHITELIST env var. Returns null if whitelist is disabled. */
+function loadWhitelist(): Set<string> | null {
+  const raw = process.env.SKILLBOT_COMMAND_WHITELIST;
+  if (!raw) return null;                            // whitelist disabled
+  if (raw === "1" || raw === "true" || raw === "default") return new Set(DEFAULT_WHITELIST);
+  return new Set(raw.split(",").map((s) => s.trim()).filter(Boolean));
+}
+
+const COMMAND_WHITELIST = loadWhitelist();
+
+/** Extract the base command name from a single shell segment (handles env vars, sudo, paths). */
+export function extractBaseCommand(segment: string): string {
+  const trimmed = segment.trim();
+  if (!trimmed) return "";
+  const tokens = trimmed.split(/\s+/);
+  for (const tok of tokens) {
+    if (tok.includes("=") && !tok.startsWith("-")) continue;  // skip VAR=val
+    if (tok === "sudo" || tok === "env" || tok === "nohup" || tok === "time") continue;
+    return tok.replace(/^.*\//, "");  // strip path prefix: /usr/bin/curl → curl
+  }
+  return tokens[0] || "";
+}
+
+/** Split a command string into individual command segments (handles |, &&, ||, ;). */
+export function splitCommandSegments(command: string): string[] {
+  return command.split(/\s*(?:\|\||&&|[|;])\s*/).map((s) => s.trim()).filter(Boolean);
+}
+
 const restrictToWorkspace = !!process.env.SKILLBOT_RESTRICT_WORKSPACE;
 
 export function guardCommand(command: string, workdir: string): string | null {
+  // Layer 1: Deny patterns (always active)
   for (const p of DENY_PATTERNS) {
     if (p.test(command)) {
       dbg("safety:deny", { command: command.slice(0, 100), pattern: p.source });
       return "Error: Command blocked by safety guard (dangerous pattern detected).";
     }
   }
+
+  // Layer 2: Command whitelist (when enabled)
+  if (COMMAND_WHITELIST) {
+    const segments = splitCommandSegments(command);
+    for (const seg of segments) {
+      const base = extractBaseCommand(seg);
+      if (base && !COMMAND_WHITELIST.has(base)) {
+        dbg("safety:whitelist-deny", { command: command.slice(0, 100), rejected: base });
+        return `Error: Command "${base}" is not in the allowed command list. Set SKILLBOT_COMMAND_WHITELIST to adjust.`;
+      }
+    }
+  }
+
+  // Layer 3: Workspace restriction (when enabled)
   if (restrictToWorkspace) {
     if (command.includes("../") || command.includes("..\\"))
       return "Error: Command blocked — path traversal not allowed in restricted mode.";

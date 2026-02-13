@@ -1,6 +1,7 @@
 ---
 name: github
 description: Interact with GitHub using the gh CLI for repos, issues, PRs, CI runs, releases, and API queries.
+platform: cross-platform
 ---
 
 # GitHub
@@ -14,7 +15,17 @@ Use this skill when the user asks about GitHub repos, issues, pull requests, CI/
 ## Setup
 
 ```bash
+# macOS
 brew install gh
+# Linux (Debian/Ubuntu)
+# sudo apt install gh
+# Windows
+# winget install GitHub.cli
+```
+
+Authenticate:
+
+```bash
 gh auth login
 ```
 

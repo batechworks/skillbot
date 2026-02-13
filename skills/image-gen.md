@@ -1,6 +1,7 @@
 ---
 name: image-gen
 description: Generate images using the OpenAI Images API (DALL-E 3, GPT Image models) via curl or Python.
+platform: cross-platform
 ---
 
 # Image Generation

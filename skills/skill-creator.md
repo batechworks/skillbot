@@ -1,6 +1,7 @@
 ---
 name: skill-creator
 description: Create new skills or modify existing ones during conversation. Use when the user wants to add a new capability, automate a workflow, or package domain knowledge as a reusable skill.
+platform: cross-platform
 ---
 
 # Skill Creator

@@ -1,6 +1,7 @@
 ---
 name: file-ops
 description: Read, write, search, and manage files and directories using standard CLI tools.
+platform: cross-platform
 ---
 
 # File Operations

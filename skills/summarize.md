@@ -1,6 +1,7 @@
 ---
 name: summarize
 description: Summarize or extract text from URLs, YouTube videos, PDFs, and local files using the summarize CLI.
+platform: cross-platform
 ---
 
 # Summarize

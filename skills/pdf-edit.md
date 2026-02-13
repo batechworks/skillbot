@@ -1,6 +1,7 @@
 ---
 name: pdf-edit
 description: Edit PDFs with natural-language instructions using the nano-pdf CLI.
+platform: cross-platform
 ---
 
 # PDF Edit

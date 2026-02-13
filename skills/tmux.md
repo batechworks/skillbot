@@ -1,6 +1,7 @@
 ---
 name: tmux
 description: Manage tmux sessions for running interactive CLIs, parallel tasks, and persistent terminal sessions.
+platform: cross-platform
 ---
 
 # tmux
@@ -136,4 +137,4 @@ tmux kill-session -t mysession
 - `tmux capture-pane -p` prints pane content to stdout.
 - For Python REPLs, set `PYTHON_BASIC_REPL=1` to avoid curses issues.
 - Detach with `Ctrl+b d` when attached.
-- tmux is available on macOS and Linux (install: `brew install tmux`).
+- Install: `brew install tmux` (macOS) · `sudo apt install tmux` (Linux).

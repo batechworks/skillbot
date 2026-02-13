@@ -1,6 +1,7 @@
 ---
 name: clipboard
 description: Read and write the macOS clipboard using pbcopy/pbpaste
+platform: macos
 ---
 
 # Clipboard

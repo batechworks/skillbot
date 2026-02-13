@@ -1,6 +1,7 @@
 ---
 name: coding-agent
 description: Run coding agents (Codex CLI, Claude Code, Pi) for automated coding tasks, PR reviews, and parallel issue fixing.
+platform: cross-platform
 ---
 
 # Coding Agent

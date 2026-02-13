@@ -1,11 +1,11 @@
 <div align="center">
   <img src="static/skillbot_icon.jpg" alt="skillbot" width="180">
   <br><br>
-  <p>A personal AI assistant where every capability is a Markdown file — not code.</p>
+  <p>A personal AI assistant where every capability is a Markdown file — plain English instructions, not code.</p>
   <p>
     <img src="https://img.shields.io/badge/core-815_lines-blue?style=for-the-badge" alt="Core Lines">
     <img src="https://img.shields.io/badge/skills-33_markdown-orange?style=for-the-badge" alt="Skills">
-    <img src="https://img.shields.io/badge/dependency-1_(openai)-green?style=for-the-badge" alt="Dependencies">
+    <img src="https://img.shields.io/badge/npm_dep-1_(openai)-green?style=for-the-badge" alt="npm Dependencies">
   </p>
   <p>
     <a href="https://github.com/batechworks/skillbot/stargazers"><img src="https://img.shields.io/github/stars/batechworks/skillbot?style=flat-square" alt="Stars"></a>
@@ -19,17 +19,20 @@
 
 ## ✨ Why skillbot?
 
-The insight is simple: **LLMs can read instructions**. Instead of writing code that calls APIs, parses responses, and handles errors — write a Markdown file that tells the LLM *how to use existing CLI tools*. The LLM becomes the integration layer.
+The insight is simple: **LLMs can read instructions**. Instead of writing TypeScript/Python code that calls APIs, parses responses, and handles errors — write a Markdown file with plain English instructions and examples. The LLM reads the instructions and decides what commands to run.
 
 ```
 Traditional:  User → Code → API → Parse → Format → User     (hundreds of lines per feature)
-skillbot:     User → LLM → bash → CLI tool → LLM → User     (one .md file per feature)
+skillbot:     User → LLM → bash → tool/API → LLM → User     (one .md file per feature)
 ```
 
+Skills are **declarative, not procedural** — you describe *what* to do, not *how* to implement it. There's no control flow, error handling, or parsing logic in a skill file. The LLM handles all of that.
+
 This works because:
-- Most tools already have CLIs (`gh`, `curl`, `docker`, `git`, `crontab`, ...)
-- LLMs are excellent at following structured instructions
+- Many services have CLIs (`gh`, `curl`, `docker`, `git`, `himalaya`, ...) or REST APIs
+- LLMs are excellent at following structured instructions and adapting to context
 - Markdown is the most readable format for both humans and LLMs
+- Skills can use `curl` for direct HTTP API calls just as easily as CLI tools
 
 ### Comparison
 
@@ -37,13 +40,16 @@ This works because:
 |---|---|---|---|
 | Core code | ~300,000 lines (TS) | ~3,500 lines (Python) | **815 lines (TS)** |
 | Skills | 52 (complex plugin system) | 7 (Markdown) | **33 (pure Markdown)** |
-| Dependencies | 200+ npm packages | 21 Python packages | **1** (`openai` SDK) |
+| npm dependencies | 200+ packages | 21 Python packages | **1** (`openai` SDK) |
+| Runtime deps | Self-contained | Self-contained | CLI tools per skill (curl, gh, etc.) |
 | Tools | 50+ custom implementations | ~10 custom tools | **2** (`bash` + `spawn`) |
 | Add a feature | Write TypeScript plugin | Write Python module | **Write a `.md` file** |
+| Security | Sandboxed | Partial | **Deny-list + opt-in whitelist** |
 | Mock testing | Vitest + fixtures | Partial | **Full coverage, all 33 skills** |
-| Setup time | ~30 min | ~10 min | **< 2 min** |
 
-> Inspired by [OpenClaw](https://github.com/nicepkg/openclaw) and [nanobot](https://github.com/AgenTuring/nanobot), skillbot pushes the "skill-as-code" philosophy to its logical extreme.
+> **Trade-off**: skillbot's 815-line core doesn't implement integrations — it delegates to existing CLI tools and HTTP APIs. The complexity moves from application code to Markdown instructions that the LLM interprets. This is intentional: less code to maintain, but you need the underlying tools installed.
+>
+> Inspired by [OpenClaw](https://github.com/nicepkg/openclaw) and [nanobot](https://github.com/AgenTuring/nanobot).
 
 ---
 
@@ -89,7 +95,7 @@ The entire core is **9 files, 815 lines**. Every feature — from weather querie
 | **Auto-Compaction** | LLM summarizes history when approaching context limit |
 | **Background Agents** | `spawn` tool runs subagents with isolated context |
 | **Heartbeat** | Reads `HEARTBEAT.md` periodically for proactive task execution |
-| **Safety Guards** | Dangerous commands blocked; optional workspace sandboxing |
+| **Safety Guards** | Deny-list + opt-in command whitelist + workspace sandboxing |
 | **Interleaved Reflection** | LLM reflects between tool rounds for better reasoning |
 | **Session Persistence** | JSONL sessions survive restarts |
 | **9 LLM Providers** | Azure, OpenAI, Anthropic, DeepSeek, Gemini, OpenRouter, Groq, Moonshot, local |
@@ -99,15 +105,18 @@ The entire core is **9 files, 815 lines**. Every feature — from weather querie
 
 ## 🎯 Skills (33)
 
-| Category | Skills |
-|----------|--------|
-| **Productivity** | weather · calendar · scheduler · notifications · clipboard · screenshot |
-| **Development** | github · coding-agent · tmux · file-ops · system-info |
-| **Communication** | email · imessage · google-workspace |
-| **Intelligence** | memory · market-data · web-search · summarize · obsidian |
-| **Media** | spotify · image-gen · whisper · voice · pdf-edit |
-| **Smart Home** | smart-home · apple-notes · apple-reminders |
-| **System** | subagent · heartbeat · skill-creator · security · context-manager · persona |
+| Category | Skills | Platform |
+|----------|--------|----------|
+| **Productivity** | weather · scheduler · file-ops · system-info | 🌐 Cross-platform |
+| **Development** | github · coding-agent · tmux | 🌐 Cross-platform |
+| **Communication** | email · google-workspace | 🌐 Cross-platform |
+| **Intelligence** | memory · market-data · web-search · summarize · obsidian | 🌐 Cross-platform |
+| **Media** | spotify · image-gen · whisper · voice · pdf-edit | 🌐 Cross-platform |
+| **Smart Home** | smart-home | 🌐 Cross-platform |
+| **System** | subagent · heartbeat · skill-creator · security · context-manager · persona | 🌐 Cross-platform |
+| **macOS** | calendar · notifications · clipboard · screenshot · imessage · apple-notes · apple-reminders | 🍎 macOS only |
+
+> **26 of 33 skills** are cross-platform (use `curl`, `gh`, `himalaya`, etc.). The 7 macOS-specific skills use native APIs (AppleScript, screencapture, pbcopy). Contributing Linux/Windows equivalents is welcome!
 
 ### Creating a new skill
 
@@ -183,10 +192,10 @@ Both are injected at the top of every system prompt. Change the bot's personalit
 
 Instead of building custom tool implementations for each integration, skillbot has exactly two tools:
 
-- **`bash`** — execute any shell command (with safety guards)
+- **`bash`** — execute any shell command (with three-layer safety: deny-list → whitelist → workspace restriction)
 - **`spawn`** — run a background subagent for complex tasks
 
-Everything else (`curl`, `gh`, `docker`, `crontab`, `osascript`, ...) is accessed through bash, guided by skills. This means skillbot can do anything your shell can do — which is effectively everything.
+Everything else (`curl`, `gh`, `docker`, `crontab`, ...) is accessed through bash, guided by skills. Skills can use **HTTP APIs directly** via `curl` — there's no requirement to install CLI tools. Many built-in skills (weather, market-data, image-gen, web-search) already use `curl` with no extra dependencies.
 
 </details>
 
@@ -244,6 +253,7 @@ All config via `.env`:
 | `SKILLBOT_CHANNEL` | CLI | `telegram`, `discord`, `slack`, `imessage` |
 | `SKILLBOT_MOCK` | — | `1` for mock mode |
 | `SKILLBOT_DEBUG` | — | `1` for debug logging |
+| `SKILLBOT_COMMAND_WHITELIST` | — | `default` or comma-separated list (see Security) |
 | `SKILLBOT_RESTRICT_WORKSPACE` | — | `1` to sandbox commands to project dir |
 | `SKILLBOT_HEARTBEAT_INTERVAL` | `1800000` | Heartbeat interval in ms (0 to disable) |
 | `SKILLBOT_CONTEXT_WINDOW` | `128000` | Context window size for auto-compaction |
@@ -255,6 +265,50 @@ All config via `.env`:
 | `/reset` | Clear conversation history |
 | `/compact` | Manually trigger compaction |
 | `/quit` | Exit CLI |
+
+---
+
+## 🔒 Security
+
+skillbot executes shell commands — that's the point. Security is addressed with **three independent layers**:
+
+| Layer | Mode | What it does |
+|-------|------|-------------|
+| **Deny-list** | Always on | Blocks known destructive patterns (`rm -rf /`, `mkfs`, fork bombs, etc.) |
+| **Command whitelist** | Opt-in | Only whitelisted base commands may execute. Unknown commands are rejected. |
+| **Workspace restriction** | Opt-in | All file paths must stay within the project directory. |
+
+### Recommended production config
+
+```env
+SKILLBOT_COMMAND_WHITELIST=default   # use built-in whitelist (curl, gh, cat, echo, ...)
+SKILLBOT_RESTRICT_WORKSPACE=1        # sandbox to project dir
+```
+
+**Why whitelist > deny-list**: Deny-lists can never cover all attack vectors (base64-encoded payloads, aliased commands, etc.). A whitelist is sound security — if a command isn't on the list, it doesn't run. The built-in default whitelist covers all commands used by the 33 shipped skills plus common shell utilities.
+
+Custom whitelist example:
+
+```env
+SKILLBOT_COMMAND_WHITELIST=curl,cat,echo,grep,ls,gh,python3,node
+```
+
+---
+
+## 🖥️ Platform
+
+The core runtime (Node.js + TypeScript) runs on **macOS, Linux, and Windows**.
+
+Skills are tagged with `platform:` in their frontmatter:
+
+| Platform | Skills | Examples |
+|----------|--------|---------|
+| 🌐 **cross-platform** | 26 | weather (curl), github (gh), email (himalaya), market-data (curl), whisper (pip) |
+| 🍎 **macos** | 7 | calendar (AppleScript), clipboard (pbcopy), screenshot (screencapture) |
+
+Skills that use CLI tools list install commands for multiple package managers where available (brew, apt, pip, cargo). Many skills use only `curl` for HTTP APIs and have **zero additional dependencies**.
+
+**Contributing**: Linux/Windows equivalents for macOS skills (e.g. `xclip` for clipboard, `notify-send` for notifications) are welcome as PRs.
 
 ---
 
@@ -280,7 +334,7 @@ skillbot/
 ├── core/               # Core agent (815 lines in 9 files)
 │   ├── index.ts        #   Entry point, heartbeat, wiring
 │   ├── llm.ts          #   LLM client with reflection
-│   ├── tools.ts        #   bash + spawn tools, safety guards
+│   ├── tools.ts        #   bash + spawn tools, 3-layer security
 │   ├── session.ts      #   Persistent sessions + auto-compaction
 │   ├── skills.ts       #   Skill loader + prompt builder
 │   ├── models.ts       #   9-provider registry
@@ -291,10 +345,10 @@ skillbot/
 │   ├── mock.ts         #   Mock tools for testing
 │   ├── test-unit.ts    #   Unit tests
 │   └── test-skills.ts  #   Integration tests
-├── skills/             # 33 Markdown skills
+├── skills/             # 33 Markdown skills (26 cross-platform, 7 macOS)
 ├── SOUL.md.example     # Bot persona template
 ├── USER.md.example     # User profile template
-└── package.json        # 1 dependency (openai)
+└── package.json        # 1 npm dependency (openai)
 ```
 
 ---

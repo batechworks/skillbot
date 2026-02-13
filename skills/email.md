@@ -1,6 +1,7 @@
 ---
 name: email
 description: Manage emails via IMAP/SMTP using the himalaya CLI. List, read, write, reply, forward, search, and organize emails from the terminal.
+platform: cross-platform
 ---
 
 # Email (Himalaya)
@@ -16,7 +17,12 @@ Use this skill when the user asks to read, send, reply, forward, search, or orga
 Install:
 
 ```bash
+# macOS
 brew install himalaya
+# Linux (Cargo)
+# cargo install himalaya
+# Linux (Nix)
+# nix-env -i himalaya
 ```
 
 Run interactive setup:

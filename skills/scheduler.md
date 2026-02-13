@@ -1,6 +1,7 @@
 ---
 name: scheduler
 description: Schedule tasks, reminders, and recurring jobs — via crontab, at, launchd, sleep, or the heartbeat task list
+platform: cross-platform
 ---
 
 # Scheduler

@@ -1,6 +1,7 @@
 ---
 name: voice
 description: Voice transcription and text-to-speech. Transcribe audio files using Whisper, or speak text aloud using macOS say command.
+platform: cross-platform
 ---
 
 # Voice

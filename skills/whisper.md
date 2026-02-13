@@ -1,6 +1,7 @@
 ---
 name: whisper
 description: Local speech-to-text transcription using OpenAI Whisper CLI (no API key needed).
+platform: cross-platform
 ---
 
 # Whisper (Speech-to-Text)
@@ -16,12 +17,9 @@ Use this skill when the user asks to transcribe audio, convert speech to text, g
 Install:
 
 ```bash
+# macOS
 brew install openai-whisper
-```
-
-Or via pip:
-
-```bash
+# All platforms (pip)
 pip install openai-whisper
 ```
 

@@ -1,6 +1,7 @@
 ---
 name: screenshot
 description: Capture screenshots and window images on macOS using screencapture
+platform: macos
 ---
 
 # Screenshot

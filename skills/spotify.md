@@ -1,6 +1,7 @@
 ---
 name: spotify
 description: Control Spotify playback and search using spogo (preferred) or spotify_player CLI.
+platform: cross-platform
 ---
 
 # Spotify
