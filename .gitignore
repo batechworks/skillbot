@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.sessions/
+cron-jobs.json
+RESEARCH_OUTLINE.md
+MEMORY.md
+memory/
+HEARTBEAT.md
+USER.md
+SOUL.md

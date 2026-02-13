@@ -1,0 +1,24 @@
+{
+  "name": "skillbots",
+  "version": "0.3.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "tsx core/index.ts",
+    "dev": "tsx watch core/index.ts",
+    "mock": "SKILLBOTS_MOCK=1 SKILLBOTS_DEBUG=1 tsx core/index.ts",
+    "imessage": "SKILLBOTS_CHANNEL=imessage tsx core/index.ts",
+    "telegram": "SKILLBOTS_CHANNEL=telegram tsx core/index.ts",
+    "discord": "SKILLBOTS_CHANNEL=discord tsx core/index.ts",
+    "slack": "SKILLBOTS_CHANNEL=slack tsx core/index.ts",
+    "test-skills": "SKILLBOTS_MOCK=1 SKILLBOTS_DEBUG=1 tsx core/test-skills.ts",
+    "test-unit": "tsx core/test-unit.ts"
+  },
+  "dependencies": {
+    "openai": "^4.82.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
