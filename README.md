@@ -1,34 +1,26 @@
+<div align="center">
+
 # skillbot
 
 **Skill is all you need.**
 
-A personal AI assistant where capabilities live in Markdown files, not code. Inspired by [OpenClaw](https://github.com/nicepkg/openclaw) and [nanobot](https://github.com/AgenTuring/nanobot), skillbot pushes the "skill-as-code" philosophy to its logical extreme: **815 lines of core TypeScript** replaces what took 300,000+ lines in OpenClaw and 8,500+ in nanobot — with the same features.
-
-> Every new capability is a `.md` file. No code changes, no redeployment, no dependencies.
+A personal AI assistant where every capability is a Markdown file — not code.
 
 ```
-Core:  815 lines  ·  33 skills  ·  9 providers  ·  5 channels  ·  1 dependency
+815 lines of core  ·  33 skills  ·  9 providers  ·  5 channels  ·  1 dependency
 ```
 
-## Why skillbot?
+</div>
 
-| | OpenClaw | nanobot | **skillbot** |
-|---|---|---|---|
-| Core code | ~300,000 lines (TS) | ~8,500 lines (Python) | **815 lines (TS)** |
-| Skills | 52 (complex plugin system) | 0 (hardcoded) | **33 (pure Markdown)** |
-| Dependencies | 200+ npm packages | 21 Python packages | **1** (`openai` SDK) |
-| Tools | 50+ custom implementations | ~10 custom tools | **2** (`bash` + `spawn`) |
-| Add a feature | Write TypeScript plugin | Write Python module | **Write a `.md` file** |
-| Mock testing | Vitest + fixtures | Partial | **Full coverage, all 33 skills** |
-| Setup time | ~30 min | ~10 min | **< 2 min** |
+---
 
-### How is this possible?
+## ✨ Why skillbot?
 
 The insight is simple: **LLMs can read instructions**. Instead of writing code that calls APIs, parses responses, and handles errors — write a Markdown file that tells the LLM *how to use existing CLI tools*. The LLM becomes the integration layer.
 
 ```
 Traditional:  User → Code → API → Parse → Format → User     (hundreds of lines per feature)
-skillbot:    User → LLM → bash → CLI tool → LLM → User     (one .md file per feature)
+skillbot:     User → LLM → bash → CLI tool → LLM → User     (one .md file per feature)
 ```
 
 This works because:
@@ -36,7 +28,23 @@ This works because:
 - LLMs are excellent at following structured instructions
 - Markdown is the most readable format for both humans and LLMs
 
-## Quick Start
+### Comparison
+
+| | [OpenClaw](https://github.com/nicepkg/openclaw) | [nanobot](https://github.com/AgenTuring/nanobot) | **skillbot** |
+|---|---|---|---|
+| Core code | ~300,000 lines (TS) | ~3,500 lines (Python) | **815 lines (TS)** |
+| Skills | 52 (complex plugin system) | 7 (Markdown) | **33 (pure Markdown)** |
+| Dependencies | 200+ npm packages | 21 Python packages | **1** (`openai` SDK) |
+| Tools | 50+ custom implementations | ~10 custom tools | **2** (`bash` + `spawn`) |
+| Add a feature | Write TypeScript plugin | Write Python module | **Write a `.md` file** |
+| Mock testing | Vitest + fixtures | Partial | **Full coverage, all 33 skills** |
+| Setup time | ~30 min | ~10 min | **< 2 min** |
+
+> Inspired by [OpenClaw](https://github.com/nicepkg/openclaw) and [nanobot](https://github.com/AgenTuring/nanobot), skillbot pushes the "skill-as-code" philosophy to its logical extreme.
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 git clone <repo-url> skillbot && cd skillbot
@@ -58,85 +66,36 @@ npm start
 
 That's it. You have an AI assistant with 33 skills, persistent memory, background agents, and auto-compaction.
 
-## Architecture
+---
+
+## 🏗️ Architecture
 
 ```
-┌───────────────────────────────────────────┐
-│ Channels: CLI · Telegram · Discord        │
-│           Slack · iMessage                │
-├───────────────────────────────────────────┤
-│          Core (815 lines total)           │
-│                                           │
-│  index.ts ─── llm.ts ─── tools.ts        │
-│     │          │            │             │
-│  session.ts  skills.ts   models.ts        │
-│     │                                     │
-│  channel.ts  types.ts   debug.ts          │
-├───────────────────────────────────────────┤
-│       33 Skills (pure Markdown)           │
-│  weather · github · memory · coding-agent │
-│  market-data · scheduler · subagent · ... │
-├───────────────────────────────────────────┤
-│       2 Tools: bash · spawn               │
-└───────────────────────────────────────────┘
+┌─────────────────────────────────────────────┐
+│  Channels: CLI · Telegram · Discord         │
+│            Slack · iMessage                 │
+├─────────────────────────────────────────────┤
+│           Core (815 lines total)            │
+│                                             │
+│   index.ts ─── llm.ts ─── tools.ts         │
+│      │          │            │              │
+│   session.ts  skills.ts   models.ts         │
+│      │                                      │
+│   channel.ts  types.ts   debug.ts           │
+├─────────────────────────────────────────────┤
+│        33 Skills (pure Markdown)            │
+│   weather · github · memory · coding-agent  │
+│   market-data · scheduler · subagent · ...  │
+├─────────────────────────────────────────────┤
+│        2 Tools: bash · spawn                │
+└─────────────────────────────────────────────┘
 ```
 
-The entire core is 9 files. Every feature — from weather queries to market analysis to smart home control — is a Markdown skill that teaches the LLM what commands to run.
+The entire core is **9 files**. Every feature — from weather queries to market analysis to smart home control — is a Markdown skill that teaches the LLM what commands to run.
 
-## Key Design Advantages
+---
 
-### 1. Skill-Driven Memory (vs hardcoded memory systems)
-
-Most agents hardcode memory into the runtime. skillbot uses a **dual-layer Markdown memory** that the LLM manages itself:
-
-- `MEMORY.md` — long-term facts (user preferences, important context)
-- `memory/YYYY-MM-DD.md` — daily interaction logs
-- Search with `grep -ri "keyword" MEMORY.md memory/`
-
-The memory skill (`always: true`) is injected into every prompt, so the LLM proactively saves and retrieves context. Before auto-compaction, it flushes important context to daily logs — no memory is ever lost.
-
-### 2. On-Demand Skill Loading (vs bloated prompts)
-
-Only `always: true` skills (memory, context-manager, persona, security) are fully injected into the system prompt. All other skills show only their name and one-line description in a catalog. When the LLM needs a skill, it reads the file:
-
-```
-cat skills/market-data.md
-```
-
-This keeps the prompt small (~2K tokens for the catalog vs ~30K if all skills were injected), while giving the LLM access to 33 capabilities.
-
-### 3. Persona System (SOUL.md + USER.md)
-
-Two Markdown files define who the bot is and who it's talking to:
-
-```bash
-cp SOUL.md.example SOUL.md   # Bot identity, tone, boundaries
-cp USER.md.example USER.md   # User profile, preferences
-```
-
-Both are injected at the top of every system prompt. Change the bot's personality by editing a file.
-
-### 4. Two Tools, Infinite Capabilities
-
-Instead of building custom tool implementations for each integration, skillbot has exactly two tools:
-
-- **`bash`** — execute any shell command (with safety guards)
-- **`spawn`** — run a background subagent for complex tasks
-
-Everything else (`curl`, `gh`, `docker`, `crontab`, `osascript`, ...) is accessed through bash, guided by skills. This means skillbot can do anything your shell can do — which is effectively everything.
-
-### 5. Comprehensive Mock Testing
-
-Every skill can be tested without real execution:
-
-```bash
-npm run test-unit     # 56 deterministic tests, <1 second, no API key needed
-npm run test-skills   # 33 skill smoke tests + 4 complex scenario tests
-```
-
-The mock system pattern-matches bash commands and returns realistic fake outputs. Complex scenarios test multi-turn reasoning, compaction flow, subagent spawning, and on-demand skill loading.
-
-## Features
+## 🧩 Features
 
 | Feature | How it works |
 |---------|-------------|
@@ -150,7 +109,9 @@ The mock system pattern-matches bash commands and returns realistic fake outputs
 | **9 LLM Providers** | Azure, OpenAI, Anthropic, DeepSeek, Gemini, OpenRouter, Groq, Moonshot, local |
 | **5 Chat Channels** | CLI, Telegram, Discord, Slack, iMessage |
 
-## Skills (33)
+---
+
+## 🎯 Skills (33)
 
 | Category | Skills |
 |----------|--------|
@@ -174,20 +135,74 @@ description: Manage Docker containers, images, and compose stacks
 # Docker
 
 ## List containers
-```bash
 docker ps -a
-```
 
 ## Build and run
-```bash
 docker compose up -d
-```
 EOF
 ```
 
 Done. No code changes needed. The bot can now manage Docker.
 
-## Providers
+---
+
+## 🔑 Key Design
+
+<details>
+<summary><b>1. Skill-Driven Memory</b> — dual-layer Markdown, not a hardcoded system</summary>
+
+Most agents hardcode memory into the runtime. skillbot uses a **dual-layer Markdown memory** that the LLM manages itself:
+
+- `MEMORY.md` — long-term facts (user preferences, important context)
+- `memory/YYYY-MM-DD.md` — daily interaction logs
+- Search with `grep -ri "keyword" MEMORY.md memory/`
+
+The memory skill (`always: true`) is injected into every prompt, so the LLM proactively saves and retrieves context. Before auto-compaction, it flushes important context to daily logs — no memory is ever lost.
+
+</details>
+
+<details>
+<summary><b>2. On-Demand Skill Loading</b> — small prompts, full capability</summary>
+
+Only `always: true` skills (memory, context-manager, persona, security) are fully injected into the system prompt. All other skills show only their name and one-line description in a catalog. When the LLM needs a skill, it reads the file:
+
+```bash
+cat skills/market-data.md
+```
+
+This keeps the prompt small (~2K tokens for the catalog vs ~30K if all skills were injected), while giving the LLM access to 33 capabilities.
+
+</details>
+
+<details>
+<summary><b>3. Persona System</b> — SOUL.md + USER.md</summary>
+
+Two Markdown files define who the bot is and who it's talking to:
+
+```bash
+cp SOUL.md.example SOUL.md   # Bot identity, tone, boundaries
+cp USER.md.example USER.md   # User profile, preferences
+```
+
+Both are injected at the top of every system prompt. Change the bot's personality by editing a file.
+
+</details>
+
+<details>
+<summary><b>4. Two Tools, Infinite Capabilities</b></summary>
+
+Instead of building custom tool implementations for each integration, skillbot has exactly two tools:
+
+- **`bash`** — execute any shell command (with safety guards)
+- **`spawn`** — run a background subagent for complex tasks
+
+Everything else (`curl`, `gh`, `docker`, `crontab`, `osascript`, ...) is accessed through bash, guided by skills. This means skillbot can do anything your shell can do — which is effectively everything.
+
+</details>
+
+---
+
+## 🌐 Providers
 
 | Provider | Env Var | Default Model |
 |----------|---------|---------------|
@@ -201,7 +216,23 @@ Done. No code changes needed. The bot can now manage Docker.
 | Moonshot | `MOONSHOT_API_KEY` | moonshot-v1-8k |
 | Local (vLLM) | `VLLM_BASE_URL` | default |
 
-## Chat Channels
+<details>
+<summary><b>Local Models (vLLM)</b></summary>
+
+```bash
+vllm serve meta-llama/Llama-3.1-8B-Instruct --port 8000
+
+echo 'SKILLBOT_PROVIDER=local' >> .env
+echo 'VLLM_BASE_URL=http://localhost:8000/v1' >> .env
+
+npm start
+```
+
+</details>
+
+---
+
+## 💬 Chat Channels
 
 | Channel | Script | Setup |
 |---------|--------|-------|
@@ -211,7 +242,9 @@ Done. No code changes needed. The bot can now manage Docker.
 | Slack | `npm run slack` | `SLACK_BOT_TOKEN` + `SLACK_APP_TOKEN` (Socket Mode) |
 | iMessage | `npm run imessage` | macOS + `imsg` CLI |
 
-## Configuration
+---
+
+## ⚙️ Configuration
 
 All config via `.env`:
 
@@ -225,7 +258,17 @@ All config via `.env`:
 | `SKILLBOT_HEARTBEAT_INTERVAL` | `1800000` | Heartbeat interval in ms (0 to disable) |
 | `SKILLBOT_CONTEXT_WINDOW` | `128000` | Context window size for auto-compaction |
 
-## Testing
+### CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `/reset` | Clear conversation history |
+| `/compact` | Manually trigger compaction |
+| `/quit` | Exit CLI |
+
+---
+
+## 🧪 Testing
 
 ```bash
 # Deterministic unit tests (no API key, <1 second)
@@ -238,7 +281,9 @@ npm run test-skills
 npm run mock
 ```
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 skillbot/
@@ -261,42 +306,6 @@ skillbot/
 ├── USER.md.example     # User profile template
 └── package.json        # 1 dependency (openai)
 ```
-
-## CLI Commands
-
-| Command | Description |
-|---------|-------------|
-| `/reset` | Clear conversation history |
-| `/compact` | Manually trigger compaction |
-| `/quit` | Exit CLI |
-
-## Local Models
-
-```bash
-vllm serve meta-llama/Llama-3.1-8B-Instruct --port 8000
-
-echo 'SKILLBOT_PROVIDER=local' >> .env
-echo 'VLLM_BASE_URL=http://localhost:8000/v1' >> .env
-
-npm start
-```
-
-## Comparison with OpenClaw and nanobot
-
-| Dimension | OpenClaw | nanobot | skillbot |
-|-----------|----------|---------|-----------|
-| Language | TypeScript | Python | TypeScript |
-| Core code | ~300,000 lines | ~8,500 lines | **815 lines** |
-| Approach | Plugin system | Monolithic agent | **Markdown skills** |
-| Skills | 52 (TS plugins) | 0 (built-in) | **33 (pure .md)** |
-| Dependencies | 200+ packages | 21 packages | **1 package** |
-| Tools | 50+ custom | ~10 custom | **2 (bash + spawn)** |
-| Memory | Custom DB | Markdown files | **Dual-layer Markdown + grep** |
-| Auto-compaction | No | No | **Yes** |
-| Mock testing | Partial | Partial | **Full (all skills)** |
-| Add a feature | Write TS plugin | Write Python | **Write .md file** |
-
-skillbot proves that with the right abstraction — Markdown skills + a minimal LLM loop — you can match the functionality of projects 100-300x larger.
 
 ---
 
