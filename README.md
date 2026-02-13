@@ -1,10 +1,6 @@
 <div align="center">
-  <img src="static/skillbot_icon.jpg" alt="skillbot" width="280">
-
-  <h1>skillbot</h1>
-
-  <p><strong>Skill is all you need.</strong></p>
-
+  <img src="static/skillbot_icon.jpg" alt="skillbot" width="180">
+  <br><br>
   <p>A personal AI assistant where every capability is a Markdown file — not code.</p>
 
 ```
@@ -148,10 +144,6 @@ The memory skill (`always: true`) is injected into every prompt, so the LLM proa
 <details>
 <summary><b>2. On-Demand Skill Loading</b> — small prompts, full capability</summary>
 
-<p align="center">
-  <img src="static/skillbot_skill_loading.jpg" alt="On-Demand Skill Loading" width="800">
-</p>
-
 Only `always: true` skills (memory, context-manager, persona, security) are fully injected into the system prompt. All other skills show only their name and one-line description in a catalog. When the LLM needs a skill, it reads the file:
 
 ```bash
@@ -161,6 +153,10 @@ cat skills/market-data.md
 This keeps the prompt small (~2K tokens for the catalog vs ~30K if all skills were injected), while giving the LLM access to 33 capabilities.
 
 </details>
+
+<p align="center">
+  <img src="static/skillbot_skill_loading.jpg" alt="On-Demand Skill Loading" width="800">
+</p>
 
 <details>
 <summary><b>3. Persona System</b> — SOUL.md + USER.md</summary>
