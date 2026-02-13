@@ -2,11 +2,17 @@
   <img src="static/skillbot_icon.jpg" alt="skillbot" width="180">
   <br><br>
   <p>A personal AI assistant where every capability is a Markdown file — not code.</p>
-
-```
-815 lines of core  ·  33 skills  ·  9 providers  ·  5 channels  ·  1 dependency
-```
-
+  <p>
+    <img src="https://img.shields.io/badge/core-815_lines-blue?style=for-the-badge" alt="Core Lines">
+    <img src="https://img.shields.io/badge/skills-33_markdown-orange?style=for-the-badge" alt="Skills">
+    <img src="https://img.shields.io/badge/dependency-1_(openai)-green?style=for-the-badge" alt="Dependencies">
+  </p>
+  <p>
+    <a href="https://github.com/batechworks/skillbot/stargazers"><img src="https://img.shields.io/github/stars/batechworks/skillbot?style=flat-square" alt="Stars"></a>
+    <a href="https://github.com/batechworks/skillbot/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="MIT License"></a>
+    <img src="https://img.shields.io/badge/TypeScript-5.7-blue?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+    <img src="https://img.shields.io/badge/node-≥18-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node">
+  </p>
 </div>
 
 ---
